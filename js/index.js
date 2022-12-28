@@ -1,41 +1,41 @@
-import { resetControls } from "./controls.js"
-import { resetTimer, updateTimerDisplay, countdown } from "./timer.js"
+import { Controls } from "./controls.js"
+import { Timer } from "./timer.js"
+import { buttonPause, buttonPlay, buttonSet, buttonStop, buttonSoundOff, 
+    buttonSoundOn, minutesDisplay, secondsDisplay } from "./elements.js"
 
 
-// Variables
 
-let buttonPlay = document.querySelector('.play')
-let buttonPause = document.querySelector('.pause')
-let buttonStop = document.querySelector('.stop')
-let buttonSet = document.querySelector('.set')
-let buttonSoundOn = document.querySelector('.soundOn')
-let buttonSoundOff = document.querySelector('.soundOff')
-let timerTimeOut
-const minutesDisplay = document.querySelector('.minutes')
-const secondsDisplay = document.querySelector('.seconds')
+
 let minutes = Number(minutesDisplay.textContent)
 
+const controls = Controls({
+    buttonPause,
+    buttonPlay,
+    buttonSet,
+    buttonStop
+})
 
+const timer = Timer({
+    minutesDisplay,
+    secondsDisplay,
+    resetControls: controls.reset,
+    minutes
+})
 
 // events
 buttonPlay.addEventListener('click', () => {
-    buttonPlay.classList.add('hide')
-    buttonPause.classList.remove('hide')
-    buttonSet.classList.add('hide')
-    buttonStop.classList.remove('hide')
-
-    countdown()
+    controls.play()
+    timer.countdown()
 })
 
 buttonPause.addEventListener('click', () => {
-    buttonPause.classList.add('hide')
-    buttonPlay.classList.remove('hide')
-    clearTimeout(timerTimeOut)
+    controls.pause()
+    timer.hold()
 })
 
 buttonStop.addEventListener('click', () => {
-    resetControls()
-    resetTimer()
+    controls.reset()
+    timer.reset()
 })
 
 buttonSoundOff.addEventListener('click', () => {
@@ -48,12 +48,14 @@ buttonSoundOn.addEventListener('click', () => {
 })
 
 buttonSet.addEventListener('click', () => {
-    let newMinutes = prompt('Quantos minutos?')
-    if (!newMinutes) {
-        resetTimer()
-        return
-    }
+   let newMinutes = controls.getMinutes()
 
-    minutes = newMinutes
-    updateTimerDisplay(minutes, 0)
+   if (!newMinutes) {
+    timer.reset()
+    return
+   }
+
+   minutes = newMinutes
+   timer.updateDisplay(minutes, 0)
+   timer.updateMinutes(minutes)
 })
